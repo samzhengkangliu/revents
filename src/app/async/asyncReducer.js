@@ -16,6 +16,7 @@ export function asyncActionFinish() {
 export function asyncActionError(error) {
   return {
     type: ASYNC_ACTION_ERROR,
+    payload: error,
   };
 }
 

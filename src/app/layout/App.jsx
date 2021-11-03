@@ -8,6 +8,7 @@ import EventDetailedPage from '../../features/events/eventDetailed/EventDetailed
 import EventForm from '../../features/events/eventForm/EventForm';
 import Sandbox from '../../features/sandbox/Sandbox';
 import ModalManager from '../common/modals/ModalManager';
+import ErrorComponent from '../common/errors/ErrorComponent';
 import { ToastContainer } from 'react-toastify';
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
                 component={EventForm}
                 key={key}
               />
+              <Route path="/error" component={ErrorComponent} />
             </Container>
           </>
         )}
