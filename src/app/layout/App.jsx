@@ -1,18 +1,25 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Route, useLocation } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
+import { ToastContainer } from 'react-toastify';
+// Components
 import NavBar from '../../features/nav/NavBar';
 import HomePage from '../../features/home/HomePage';
 import EventDashboard from '../../features/events/eventDashboard/EventDashboard';
 import EventDetailedPage from '../../features/events/eventDetailed/EventDetailedPage';
 import EventForm from '../../features/events/eventForm/EventForm';
+import AccountPage from '../../features/auth/AccountPage';
 import Sandbox from '../../features/sandbox/Sandbox';
 import ModalManager from '../common/modals/ModalManager';
 import ErrorComponent from '../common/errors/ErrorComponent';
-import { ToastContainer } from 'react-toastify';
+import LoadingComponent from './LoadingComponent';
 
 export default function App() {
   const { key } = useLocation();
+  const { initialized } = useSelector((state) => state.async);
+
+  if (!initialized) return <LoadingComponent content="Loading app..." />;
 
   return (
     <>
@@ -34,6 +41,7 @@ export default function App() {
                 component={EventForm}
                 key={key}
               />
+              <Route path="/account" component={AccountPage} />
               <Route path="/error" component={ErrorComponent} />
             </Container>
           </>
