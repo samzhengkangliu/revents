@@ -20,6 +20,7 @@ export default function ProfileHeader({ profile, isCurrentUser }) {
               <Item.Image
                 size="small"
                 src={profile.photoURL || '/assets/user.png'}
+                circular
               />
               <Item.Content verticalAlign="middle">
                 <Header
