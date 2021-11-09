@@ -35,12 +35,18 @@ export default function EventForm({ match, history }) {
   );
   const { loading, error } = useSelector((state) => state.async);
 
-  const initialValue = selectedEvent ?? {
+  const initialValues = selectedEvent ?? {
     title: '',
     category: '',
     description: '',
-    city: { address: '', latLng: null },
-    venue: { address: '', latLng: null },
+    city: {
+      address: '',
+      latLng: null,
+    },
+    venue: {
+      address: '',
+      latLng: null,
+    },
     date: '',
   };
 
@@ -78,12 +84,13 @@ export default function EventForm({ match, history }) {
 
   if (loading) return <LoadingComponent content="Loading event..." />;
 
-  if (error) return <Redirect to="/error/" />;
+  if (error) return <Redirect to="/error" />;
 
   return (
     <Segment clearing>
       <Formik
-        initialValues={initialValue}
+        initialValues={initialValues}
+        validationSchema={validationSchema}
         onSubmit={async (values, { setSubmitting }) => {
           try {
             selectedEvent
@@ -96,7 +103,6 @@ export default function EventForm({ match, history }) {
             setSubmitting(false);
           }
         }}
-        validationSchema={validationSchema}
       >
         {({ isSubmitting, dirty, isValid, values }) => (
           <Form className="ui form">
@@ -104,7 +110,7 @@ export default function EventForm({ match, history }) {
             <MyTextInput name="title" placeholder="Event title" />
             <MySelectInput
               name="category"
-              placeholder="Category"
+              placeholder="Event category"
               options={categoryData}
             />
             <MyTextArea name="description" placeholder="Description" rows={3} />
@@ -122,37 +128,41 @@ export default function EventForm({ match, history }) {
             />
             <MyDateInput
               name="date"
-              placeholderText="Event Date"
+              placeholderText="Event date"
               timeFormat="HH:mm"
               showTimeSelect
               timeCaption="time"
               dateFormat="MMMM d, yyyy h:mm a"
             />
-            <Button
-              loading={loadingCancel}
-              type="button"
-              floated="left"
-              color={selectedEvent.isCancelled ? 'green' : 'red'}
-              content={
-                selectedEvent.isCancelled ? 'Reactivate Event' : 'Cancel Event'
-              }
-              onClick={() => setConfirmOpen(true)}
-            />
+            {selectedEvent && (
+              <Button
+                loading={loadingCancel}
+                type="button"
+                floated="left"
+                color={selectedEvent.isCancelled ? 'green' : 'red'}
+                content={
+                  selectedEvent.isCancelled
+                    ? 'Reactivate event'
+                    : 'Cancel Event'
+                }
+                onClick={() => setConfirmOpen(true)}
+              />
+            )}
             <Button
               loading={isSubmitting}
-              disabled={!dirty || !isValid || isSubmitting}
+              disabled={!isValid || !dirty || isSubmitting}
               type="submit"
               floated="right"
               positive
               content="Submit"
             />
-
             <Button
-              floated="right"
-              content="Cancel"
+              disabled={isSubmitting}
               as={Link}
               to="/events"
-              disabled={isSubmitting}
+              type="submit"
+              floated="right"
+              content="Cancel"
             />
           </Form>
         )}
@@ -160,7 +170,7 @@ export default function EventForm({ match, history }) {
       <Confirm
         content={
           selectedEvent?.isCancelled
-            ? 'This will reactive the event - are you sure?'
+            ? 'This will reactivate the event - are you sure?'
             : 'This will cancel the event - are you sure?'
         }
         open={confirmOpen}
