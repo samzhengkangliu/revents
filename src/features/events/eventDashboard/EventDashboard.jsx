@@ -1,25 +1,28 @@
-import React, { useState } from 'react';
-import { Grid, GridColumn } from 'semantic-ui-react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from "react";
+import { Grid, GridColumn } from "semantic-ui-react";
+import { useDispatch, useSelector } from "react-redux";
 // Redux
-import { listenToEvents } from '../eventActions';
+import { listenToEvents } from "../eventActions";
 // Components
-import EventList from './EventList';
-import EventListItemPlaceholder from './EventListItemPlaceholder';
-import EventFilters from './EventFilters';
+import EventList from "./EventList";
+import EventListItemPlaceholder from "./EventListItemPlaceholder";
+import EventFilters from "./EventFilters";
 // API
-import { listenToEventsFromFirestore } from '../../../app/firestore/firestoreService';
+import { listenToEventsFromFirestore } from "../../../app/firestore/firestoreService";
 // Hooks
-import useFireStoreCollection from '../../../app/hooks/useFirestoreCollection';
+import useFireStoreCollection from "../../../app/hooks/useFirestoreCollection";
+import EventsFeed from "./EventsFeed";
 
 export default function EventDashboard() {
   const dispatch = useDispatch();
   const { events } = useSelector((state) => state.event);
   const { loading } = useSelector((state) => state.async);
+  const { authenticated } = useSelector((state) => state.auth);
+
   const [predicate, setPredicate] = useState(
     new Map([
-      ['startDate', new Date()],
-      ['filter', 'all'],
+      ["startDate", new Date()],
+      ["filter", "all"],
     ])
   );
 
@@ -45,6 +48,7 @@ export default function EventDashboard() {
         <EventList events={events} />
       </GridColumn>
       <GridColumn width={6}>
+        {authenticated && <EventsFeed />}
         <EventFilters
           predicate={predicate}
           setPredicate={handleSetPredicate}

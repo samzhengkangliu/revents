@@ -1,6 +1,6 @@
-import firebase from '../config/firebase';
-import { toast } from 'react-toastify';
-import { setUserProfileData } from './firestoreService';
+import firebase from "../config/firebase";
+import { toast } from "react-toastify";
+import { setUserProfileData } from "./firestoreService";
 
 export function firebaseObjectToArray(snapshot) {
   if (snapshot) {
@@ -34,10 +34,10 @@ export async function registerInFirebase(creds) {
 
 export async function socialLogin(selectedProvider) {
   let provider;
-  if (selectedProvider === 'facebook') {
+  if (selectedProvider === "facebook") {
     provider = new firebase.auth.FacebookAuthProvider();
   }
-  if (selectedProvider === 'google') {
+  if (selectedProvider === "google") {
     provider = new firebase.auth.GoogleAuthProvider();
   }
 
@@ -85,4 +85,13 @@ export function addEventChatComment(eventId, values) {
 
 export function getEventChatRef(eventId) {
   return firebase.database().ref(`chat/${eventId}`).orderByKey();
+}
+
+export function getUserFeedRef() {
+  const user = firebase.auth().currentUser;
+  return firebase
+    .database()
+    .ref(`posts/${user.uid}`)
+    .orderByKey()
+    .limitToLast(5);
 }
