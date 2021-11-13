@@ -91,7 +91,7 @@ export function getUserFeedRef() {
   const user = firebase.auth().currentUser;
   return firebase
     .database()
-    .ref(`posts/${user.uid}`)
+    .ref(`posts/${user?.uid}`)
     .orderByKey()
     .limitToLast(5);
 }

@@ -1,29 +1,31 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Grid, GridColumn } from 'semantic-ui-react';
-import { listenToEventFromFirestore } from '../../../app/firestore/firestoreService';
-import useFirestoreDoc from '../../../app/hooks/useFirestoreDoc';
-import { listenToEvents } from '../eventActions';
-import EventDetailedChat from './EventDetailedChat';
-import EventDetailedHeader from './EventDetailedHeader';
-import EventDetailedInfo from './EventDetailedInfo';
-import EventDetailedSidebar from './EventDetailedSidebar';
-import LoadingComponent from '../../../app/layout/LoadingComponent';
-import { Redirect } from 'react-router-dom';
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Grid, GridColumn } from "semantic-ui-react";
+import { Redirect } from "react-router-dom";
+// Redux
+import { listenToSelectedEvent } from "../eventActions";
+// API
+import { listenToEventFromFirestore } from "../../../app/firestore/firestoreService";
+// Hooks
+import useFirestoreDoc from "../../../app/hooks/useFirestoreDoc";
+// Components
+import EventDetailedChat from "./EventDetailedChat";
+import EventDetailedHeader from "./EventDetailedHeader";
+import EventDetailedInfo from "./EventDetailedInfo";
+import EventDetailedSidebar from "./EventDetailedSidebar";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
 
 export default function EventDetailedPage({ match }) {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.auth);
-  const event = useSelector((state) =>
-    state.event.events.find((e) => e.id === match.params.id)
-  );
+  const event = useSelector((state) => state.event.selectedEvent);
   const { loading, error } = useSelector((state) => state.async);
   const isHost = event?.hostUid === currentUser.uid;
   const isGoing = event?.attendees?.some((a) => a.id === currentUser.uid);
 
   useFirestoreDoc({
     query: () => listenToEventFromFirestore(match.params.id),
-    data: (event) => dispatch(listenToEvents([event])),
+    data: (event) => dispatch(listenToSelectedEvent(event)),
     deps: [match.params.id, dispatch],
   });
 

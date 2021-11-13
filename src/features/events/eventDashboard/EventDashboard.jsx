@@ -1,23 +1,22 @@
-import React, { useState } from "react";
-import { Grid, GridColumn } from "semantic-ui-react";
+import React, { useEffect, useState } from "react";
+import { Grid, Loader } from "semantic-ui-react";
 import { useDispatch, useSelector } from "react-redux";
 // Redux
-import { listenToEvents } from "../eventActions";
+import { clearEvents, fetchEvents } from "../eventActions";
 // Components
 import EventList from "./EventList";
 import EventListItemPlaceholder from "./EventListItemPlaceholder";
 import EventFilters from "./EventFilters";
-// API
-import { listenToEventsFromFirestore } from "../../../app/firestore/firestoreService";
-// Hooks
-import useFireStoreCollection from "../../../app/hooks/useFirestoreCollection";
 import EventsFeed from "./EventsFeed";
 
 export default function EventDashboard() {
+  const limit = 2;
   const dispatch = useDispatch();
-  const { events } = useSelector((state) => state.event);
+  const { events, moreEvents } = useSelector((state) => state.event);
   const { loading } = useSelector((state) => state.async);
   const { authenticated } = useSelector((state) => state.auth);
+  const [lastDocSnapshot, setLastDocSnapshot] = useState(null);
+  const [loadingInitial, setLoadingInitial] = useState(false);
 
   const [predicate, setPredicate] = useState(
     new Map([
@@ -27,34 +26,55 @@ export default function EventDashboard() {
   );
 
   function handleSetPredicate(key, value) {
+    dispatch(clearEvents());
+    setLastDocSnapshot(null);
     setPredicate(new Map(predicate.set(key, value)));
   }
 
-  useFireStoreCollection({
-    query: () => listenToEventsFromFirestore(predicate),
-    data: (events) => dispatch(listenToEvents(events)),
-    deps: [dispatch, predicate],
-  });
+  useEffect(() => {
+    setLoadingInitial(true);
+    dispatch(fetchEvents(predicate, limit)).then((lastVisible) => {
+      setLastDocSnapshot(lastVisible);
+      setLoadingInitial(false);
+    });
+    return () => dispatch(clearEvents());
+  }, [dispatch, predicate]);
+
+  function handleFetchNextEvents() {
+    dispatch(fetchEvents(predicate, limit, lastDocSnapshot)).then(
+      (lastVisible) => {
+        setLastDocSnapshot(lastVisible);
+      }
+    );
+  }
 
   return (
     <Grid>
-      <GridColumn width={10}>
-        {loading && (
+      <Grid.Column width={10}>
+        {loadingInitial && (
           <>
             <EventListItemPlaceholder />
             <EventListItemPlaceholder />
           </>
         )}
-        <EventList events={events} />
-      </GridColumn>
-      <GridColumn width={6}>
+        <EventList
+          events={events}
+          getNextEvents={handleFetchNextEvents}
+          loading={loading}
+          moreEvents={moreEvents}
+        />
+      </Grid.Column>
+      <Grid.Column width={6}>
         {authenticated && <EventsFeed />}
         <EventFilters
           predicate={predicate}
           setPredicate={handleSetPredicate}
           loading={loading}
         />
-      </GridColumn>
+      </Grid.Column>
+      <Grid.Column width={10}>
+        <Loader active={loading} />
+      </Grid.Column>
     </Grid>
   );
 }
