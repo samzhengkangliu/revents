@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Segment, Header, Comment } from "semantic-ui-react";
 import { formatDistance } from "date-fns";
+import { onValue, off } from "firebase/database";
 // Redux
 import { listenToEventChat } from "../eventActions";
 // API
@@ -29,7 +30,7 @@ export default function EventDetailedChat({ eventId }) {
   }
 
   useEffect(() => {
-    getEventChatRef(eventId).on("value", (snapshot) => {
+    onValue(getEventChatRef(eventId), (snapshot) => {
       if (!snapshot.exists()) return;
       dispatch(
         listenToEventChat(firebaseObjectToArray(snapshot.val()).reverse())
@@ -38,7 +39,7 @@ export default function EventDetailedChat({ eventId }) {
     return () => {
       dispatch({ type: CLEAR_COMMENTS });
       // Turns off listener for chat
-      getEventChatRef().off();
+      off(getEventChatRef());
     };
   }, [eventId, dispatch]);
 

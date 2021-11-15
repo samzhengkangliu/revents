@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Header, Segment, Feed } from "semantic-ui-react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { onValue, off } from "firebase/database";
+// API
 import {
   getUserFeedRef,
   firebaseObjectToArray,
 } from "../../../app/firestore/firebaseService";
+// Redux
 import { listenToFeed } from "../../profiles/profileActions";
+// Components
 import EventFeedItem from "./EventFeedItem";
 
 export default function EventsFeed() {
@@ -14,7 +17,7 @@ export default function EventsFeed() {
   const { feed } = useSelector((state) => state.profile);
 
   useEffect(() => {
-    getUserFeedRef().on("value", (snapshot) => {
+    onValue(getUserFeedRef(), (snapshot) => {
       if (!snapshot.exists()) {
         return;
       }
@@ -22,7 +25,7 @@ export default function EventsFeed() {
       dispatch(listenToFeed(feed));
     });
     return () => {
-      getUserFeedRef().off();
+      off(getUserFeedRef());
     };
   }, [dispatch]);
 
