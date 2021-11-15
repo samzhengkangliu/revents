@@ -1,9 +1,8 @@
-import React from 'react';
-import { format } from 'date-fns';
-import { Link } from 'react-router-dom';
-import { Button, Icon, Item, Label, List, Segment } from 'semantic-ui-react';
-import EventListAttendee from './EventListAttendee';
-import { deleteEventInFirestore } from '../../../app/firestore/firestoreService';
+import React from "react";
+import { format } from "date-fns";
+import { Link } from "react-router-dom";
+import { Button, Icon, Item, Label, List, Segment } from "semantic-ui-react";
+import EventListAttendee from "./EventListAttendee";
 
 export default function EventListItem({ event }) {
   return (
@@ -15,12 +14,12 @@ export default function EventListItem({ event }) {
             <Item.Content>
               <Item.Header content={event.title} />
               <Item.Description>
-                Host by{' '}
-                <Link to={`/profile/${event.hostUid}`}>{event.hostedBy}</Link>{' '}
+                Host by{" "}
+                <Link to={`/profile/${event.hostUid}`}>{event.hostedBy}</Link>{" "}
               </Item.Description>
               {event.isCancelled && (
                 <Label
-                  style={{ top: '-40px' }}
+                  style={{ top: "-40px" }}
                   ribbon="right"
                   color="red"
                   content="This event has been cancelled"
@@ -32,7 +31,7 @@ export default function EventListItem({ event }) {
       </Segment>
       <Segment>
         <span>
-          <Icon name="clock" /> {format(event.date, 'MMMM d, yyyy h:mm a')}
+          <Icon name="clock" /> {format(event.date, "MMMM d, yyyy h:mm a")}
           <Icon name="clock" /> {event.venue.address}
         </span>
       </Segment>
@@ -45,12 +44,6 @@ export default function EventListItem({ event }) {
       </Segment>
       <Segment clearing>
         <div>{event.description}</div>
-        <Button
-          color="red"
-          floated="right"
-          content="Delete"
-          onClick={() => deleteEventInFirestore(event.id)}
-        />
         <Button
           color="teal"
           floated="right"
